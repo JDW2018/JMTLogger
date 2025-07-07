@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated examples to demonstrate colored output
 - Enhanced README with color feature documentation
 
+### Changed
+- **License changed from MIT to Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**
+- Non-commercial use only - commercial licensing available upon request
+
 ## [1.0.0] - 2025-07-07
 
 ### Added

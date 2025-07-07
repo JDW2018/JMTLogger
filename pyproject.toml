@@ -7,14 +7,14 @@ name = "jmtlogger"
 version = "1.0.0"
 description = "A multiprocessing-safe logging engine for Python applications"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "CC-BY-NC-4.0"}
 authors = [
     {name = "JMTechnical Group", email = "support@jmtechnical.com"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
