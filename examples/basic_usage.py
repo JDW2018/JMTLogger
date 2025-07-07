@@ -8,13 +8,14 @@ import time
 
 def main():
     """Demonstrate basic logger usage."""
-    # Create a logger with default settings
+    # Create a logger with default settings (colors enabled by default)
     logger = JMTLogger(
         name="basic_example",
         log_to_console=True,
         log_to_file=True,
         log_file="basic_example.log",
-        log_level="INFO"
+        log_level="INFO",
+        use_colors=True  # Enable colored console output
     )
     
     # Log messages at different levels

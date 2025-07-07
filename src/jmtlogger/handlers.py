@@ -8,8 +8,123 @@ import multiprocessing
 import threading
 import queue
 import atexit
-from typing import Optional, Any
+import sys
+import os
+from typing import Optional, Any, Dict
 from pathlib import Path
+
+
+class ColoredFormatter(logging.Formatter):
+    """
+    A formatter that adds color codes to log messages based on log level.
+    Works on both Windows and Unix-like systems.
+    """
+    
+    # ANSI color codes
+    COLORS = {
+        'DEBUG': '\033[36m',      # Cyan
+        'INFO': '\033[32m',       # Green
+        'WARNING': '\033[33m',    # Yellow
+        'ERROR': '\033[31m',      # Red
+        'CRITICAL': '\033[35m',   # Magenta
+    }
+    
+    RESET = '\033[0m'
+    
+    def __init__(self, *args, use_colors: bool = None, **kwargs):
+        """
+        Initialize the colored formatter.
+        
+        Args:
+            use_colors: Whether to use colors. If None, auto-detect based on terminal support.
+        """
+        super().__init__(*args, **kwargs)
+        
+        if use_colors is None:
+            # Auto-detect color support
+            self.use_colors = self._supports_color()
+        else:
+            self.use_colors = use_colors
+        
+        # Enable ANSI color support on Windows 10+
+        if self.use_colors and os.name == 'nt':
+            self._enable_windows_ansi()
+    
+    def _supports_color(self) -> bool:
+        """
+        Check if the terminal supports colors.
+        """
+        # Check if we're in a terminal
+        if not hasattr(sys.stdout, 'isatty') or not sys.stdout.isatty():
+            return False
+        
+        # Check environment variables
+        if os.getenv('NO_COLOR'):
+            return False
+        
+        if os.getenv('FORCE_COLOR'):
+            return True
+        
+        # Windows terminal detection
+        if os.name == 'nt':
+            # Windows 10 version 1511 and later support ANSI escape sequences
+            try:
+                import platform
+                version = platform.version()
+                major, minor, build = map(int, version.split('.'))
+                return major >= 10 and build >= 10586
+            except:
+                return False
+        
+        # Unix-like systems
+        term = os.getenv('TERM', '').lower()
+        if 'color' in term or term in ['xterm', 'xterm-256color', 'screen', 'linux']:
+            return True
+        
+        return False
+    
+    def _enable_windows_ansi(self) -> None:
+        """
+        Enable ANSI escape sequence processing on Windows.
+        """
+        try:
+            import ctypes
+            from ctypes import wintypes
+            
+            kernel32 = ctypes.windll.kernel32
+            
+            # Get stdout handle
+            stdout_handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+            
+            # Get current console mode
+            mode = wintypes.DWORD()
+            kernel32.GetConsoleMode(stdout_handle, ctypes.byref(mode))
+            
+            # Enable virtual terminal processing (ANSI escape sequences)
+            ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+            kernel32.SetConsoleMode(stdout_handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        except Exception:
+            # If we can't enable ANSI support, disable colors
+            self.use_colors = False
+    
+    def format(self, record: logging.LogRecord) -> str:
+        """
+        Format the log record with colors if enabled.
+        """
+        if not self.use_colors:
+            return super().format(record)
+        
+        # Get the color for this log level
+        level_color = self.COLORS.get(record.levelname, '')
+        
+        # Format the message normally first
+        formatted_message = super().format(record)
+        
+        # Add color codes around the entire message
+        if level_color:
+            formatted_message = f"{level_color}{formatted_message}{self.RESET}"
+        
+        return formatted_message
 
 
 class MultiprocessingHandler(logging.Handler):
@@ -108,10 +223,28 @@ class SafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
             super().emit(record)
 
 
-def create_console_handler(formatter: logging.Formatter) -> logging.Handler:
-    """Create a console handler with the specified formatter."""
+def create_console_handler(formatter: logging.Formatter, use_colors: bool = True) -> logging.Handler:
+    """
+    Create a console handler with the specified formatter.
+    
+    Args:
+        formatter: The base formatter to use
+        use_colors: Whether to enable colored output (auto-detected if True)
+    """
     handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
+    
+    # If colors are requested and we have a regular formatter, wrap it with colors
+    if use_colors and not isinstance(formatter, ColoredFormatter):
+        # Create a colored formatter with the same format string
+        colored_formatter = ColoredFormatter(
+            fmt=formatter._fmt,
+            datefmt=formatter.datefmt,
+            use_colors=True
+        )
+        handler.setFormatter(colored_formatter)
+    else:
+        handler.setFormatter(formatter)
+    
     return handler
 
 

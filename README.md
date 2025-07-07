@@ -6,6 +6,7 @@ A robust, thread-safe and process-safe logging engine designed for Python applic
 
 - **Multiprocessing Support**: Thread-safe and process-safe logging using queue-based handlers
 - **Configurable Output**: Console, file, or both output destinations
+- **Colored Console Output**: Automatic color coding for different log levels on Windows and Linux
 - **Standardized Interface**: Consistent logging across all projects
 - **Easy Integration**: Simple import and setup
 - **Performance Optimized**: Minimal overhead in concurrent environments
@@ -38,19 +39,42 @@ pip install -e .[dev]
 ```python
 from jmtlogger import JMTLogger
 
-# Initialize logger
+# Initialize logger with colored output (default)
 logger = JMTLogger(
     name="my_app",
     log_to_console=True,
     log_to_file=True,
     log_file="app.log",
-    log_level="INFO"
+    log_level="INFO",
+    use_colors=True  # Enable colored console output (default: True)
 )
 
 # Use in your application
-logger.info("Application started")
-logger.error("An error occurred")
+logger.info("Application started")  # Green text
+logger.warning("Warning message")   # Yellow text
+logger.error("An error occurred")   # Red text
 logger.close()  # Clean up when done
+```
+
+## Color Support
+
+JMTLogger automatically detects terminal color support and applies colors to console output:
+
+- **DEBUG**: Cyan
+- **INFO**: Green  
+- **WARNING**: Yellow
+- **ERROR**: Red
+- **CRITICAL**: Magenta
+
+Colors work on:
+- Windows 10+ (with ANSI support)
+- Linux terminals
+- macOS terminals
+- Most modern terminal emulators
+
+To disable colors:
+```python
+logger = JMTLogger(name="my_app", use_colors=False)
 ```
 
 ## Advanced Configuration
@@ -67,6 +91,7 @@ config = LoggerConfig(
     log_file="logs/app.log",
     max_file_size=50 * 1024 * 1024,  # 50MB
     backup_count=10,
+    use_colors=True,  # Enable colored console output
     console_format="%(levelname)s: %(message)s",
     file_format="%(asctime)s - %(name)s - %(levelname)s - %(processName)s - %(threadName)s - %(funcName)s:%(lineno)d - %(message)s"
 )

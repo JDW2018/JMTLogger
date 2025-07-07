@@ -13,6 +13,7 @@ from .handlers import (
     create_console_handler,
     create_file_handler,
     create_multiprocessing_handler,
+    ColoredFormatter,
 )
 
 
@@ -72,7 +73,7 @@ class JMTLogger:
         
         # Add console handler if requested
         if self.config.log_to_console:
-            console_handler = create_console_handler(console_formatter)
+            console_handler = create_console_handler(console_formatter, self.config.use_colors)
             mp_console_handler = create_multiprocessing_handler(console_handler)
             mp_console_handler.setLevel(self.config.log_level)
             self._logger.addHandler(mp_console_handler)

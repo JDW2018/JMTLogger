@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Colored Console Output**: Automatic color coding for different log levels
+  - DEBUG: Cyan
+  - INFO: Green
+  - WARNING: Yellow
+  - ERROR: Red
+  - CRITICAL: Magenta
+- Cross-platform color support (Windows 10+, Linux, macOS)
+- Automatic terminal color detection
+- `use_colors` configuration option to enable/disable colors
+- ColoredFormatter class for custom color implementations
+- Color test example script
+
+### Enhanced
+- Console handler now supports colored output by default
+- Configuration class extended with color settings
+- Updated examples to demonstrate colored output
+- Enhanced README with color feature documentation
+
 ## [1.0.0] - 2025-07-07
 
 ### Added

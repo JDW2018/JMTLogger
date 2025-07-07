@@ -23,6 +23,7 @@ class LoggerConfig:
     console_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(processName)s - %(threadName)s - %(message)s"
     file_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(processName)s - %(threadName)s - %(funcName)s:%(lineno)d - %(message)s"
     date_format: str = "%Y-%m-%d %H:%M:%S"
+    use_colors: bool = True  # Enable colored console output
     
     def __post_init__(self) -> None:
         """Validate and normalize configuration after initialization."""
@@ -62,4 +63,5 @@ class LoggerConfig:
             "console_format": self.console_format,
             "file_format": self.file_format,
             "date_format": self.date_format,
+            "use_colors": self.use_colors,
         }
